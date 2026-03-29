@@ -1,8 +1,13 @@
 # Gmail Search Builder / Gmail 搜尋指令產生器
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-2d5a3d?style=for-the-badge)](https://moreshop07.github.io/gmail-search-builder/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+
 > Zero API. Zero login. Just paste and clean.
 >
 > 零 API、零登入。點幾下產生指令，貼進 Gmail 30 秒清乾淨。
+
+**[👉 Try it now / 立即使用](https://moreshop07.github.io/gmail-search-builder/)**
 
 ---
 
@@ -50,7 +55,8 @@ No server, no build step, no dependencies. Just one HTML file.
 
 ## Live Demo / 線上版
 
-[https://moresie.com/tools/gmail-cleaner/](https://moresie.com/tools/gmail-cleaner/)
+- **GitHub Pages**: [moreshop07.github.io/gmail-search-builder](https://moreshop07.github.io/gmail-search-builder/)
+- **Moresie**: [moresie.com/tools/gmail-cleaner](https://moresie.com/tools/gmail-cleaner/)
 
 ## Author / 作者
 
