@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gmail 清理指令產生器｜Moresie 免費工具</title>
+<meta name="description" content="不懂程式也能用！點幾下自動產生 Gmail 搜尋指令，30 秒清掉幾百封廣告信。藥師張菁月免費提供。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5f0e8;
+    --green: #2d5a3d;
+    --green-light: #b8d4b8;
+    --green-mid: #4a7a5a;
+    --warm: #ece5d4;
+    --border: #c8bda0;
+    --text: #2a2018;
+    --muted: #8a7a5a;
+    --white: #ffffff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  nav {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .nav-logo {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+  .nav-tag { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
+
+  .hero {
+    background: var(--green);
+    padding: 64px 24px 56px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: #3d7a53;
+    opacity: 0.3;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: #1e3d2a;
+    opacity: 0.4;
+  }
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 500;
+    color: var(--green-light);
+    letter-spacing: 0.14em;
+    margin-bottom: 16px;
+    position: relative; z-index: 1;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(26px, 6vw, 40px);
+    font-weight: 600;
+    color: var(--cream);
+    line-height: 1.35;
+    margin-bottom: 16px;
+    position: relative; z-index: 1;
+  }
+  .hero h1 em { font-style: normal; color: var(--green-light); }
+  .hero-sub {
+    font-size: 14px; color: #b8d4b890;
+    line-height: 1.7; max-width: 340px;
+    margin: 0 auto 32px;
+    position: relative; z-index: 1;
+  }
+  .hero-stat {
+    display: inline-flex; gap: 24px;
+    background: #ffffff12;
+    border: 1px solid #ffffff20;
+    border-radius: 14px;
+    padding: 14px 28px;
+    position: relative; z-index: 1;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--cream); display: block;
+  }
+  .stat-label { font-size: 10px; color: var(--green-light); letter-spacing: 0.06em; }
+  .stat-divider { width: 1px; background: #ffffff20; align-self: stretch; }
+
+  .main { max-width: 680px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 12px; font-weight: 500;
+    color: var(--muted); letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--warm); }
+
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  input[type=text] {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type=text]:focus { border-color: var(--green); background: var(--white); }
+  input[type=text]::placeholder { color: #bbb0a0; }
+  .input-wrap {
+    position: relative;
+  }
+  .input-wrap input { padding-right: 38px; }
+  .clear-btn {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 24px; height: 24px; border-radius: 50%;
+    border: none; background: var(--border); color: var(--white);
+    font-size: 13px; font-weight: 600; line-height: 1;
+    cursor: pointer; display: none;
+    align-items: center; justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+  }
+  .clear-btn:hover { background: var(--muted); }
+  .input-wrap input:not(:placeholder-shown) + .clear-btn { display: flex; }
+
+  .tag-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    font-size: 12px; padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    cursor: pointer; color: var(--muted);
+    background: var(--cream);
+    transition: all 0.18s;
+    user-select: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tag:hover { border-color: var(--green-mid); color: var(--green); }
+  .tag.active { background: var(--green); color: var(--cream); border-color: var(--green); }
+  .tag.tag-danger { border-color: #d93025 !important; color: #d93025 !important; font-weight: 600; background: #fef2f2; }
+  .tag.tag-danger:hover { background: #fde8e8; }
+  .tag.tag-danger.active { background: #d93025 !important; border-color: #d93025 !important; color: white !important; }
+
+  .result-card { background: var(--green); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .result-label { font-size: 11px; font-weight: 500; color: var(--green-light); letter-spacing: 0.1em; margin-bottom: 12px; }
+  .result-box {
+    background: #1e3d2a;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px; color: var(--cream);
+    line-height: 1.7; min-height: 50px;
+    word-break: break-all; margin-bottom: 14px;
+    border: 1px solid #3d5a45;
+  }
+  .result-empty { font-family: 'DM Sans', sans-serif; font-size: 13px; color: #6a9a7a; font-style: italic; }
+  .copy-btn {
+    width: 100%; padding: 13px;
+    background: var(--cream); color: var(--green);
+    border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.18s;
+    letter-spacing: 0.02em;
+  }
+  .copy-btn:hover { background: var(--white); transform: translateY(-1px); }
+  .copy-btn.copied { background: var(--green-light); color: var(--green); }
+  .btn-group { display: flex; gap: 10px; }
+  .btn-group .copy-btn { flex: 1; }
+  .gmail-open-btn {
+    flex: 1.2; padding: 13px;
+    background: #ea4335; color: white;
+    border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.18s;
+    letter-spacing: 0.02em;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    text-decoration: none;
+  }
+  .gmail-open-btn:hover { background: #d33426; transform: translateY(-1px); color: white; }
+  .gmail-open-btn .gmail-logo {
+    font-size: 18px; line-height: 1;
+  }
+  .reset-btn {
+    width: 100%; padding: 12px;
+    background: transparent; color: var(--muted);
+    border: 1px dashed var(--border); border-radius: 10px;
+    font-size: 13px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.18s;
+    margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .reset-btn:hover { border-color: #d93025; color: #d93025; background: #fef2f2; }
+
+  .steps-card {
+    background: var(--warm);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px; margin-bottom: 16px;
+  }
+  .step-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+  .step-row:last-child { margin-bottom: 0; }
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--green); color: var(--cream);
+    font-size: 11px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .step-text { font-size: 13px; color: var(--text); line-height: 1.6; }
+  .step-text strong { font-weight: 500; color: var(--green); }
+
+  .cta-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px; text-align: center; margin-top: 32px;
+  }
+  .cta-eyebrow { font-size: 11px; color: var(--green-mid); letter-spacing: 0.1em; font-weight: 500; margin-bottom: 10px; }
+  .cta-title { font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 10px; }
+  .cta-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 22px; max-width: 320px; margin-left: auto; margin-right: auto; }
+  .cta-features { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 24px; }
+  .feature-pill { font-size: 12px; padding: 5px 12px; background: var(--warm); color: var(--green); border-radius: 20px; border: 1px solid var(--border); }
+  .cta-btn {
+    display: inline-block; background: var(--green); color: var(--cream);
+    padding: 15px 36px; border-radius: 12px;
+    font-size: 15px; font-weight: 500;
+    text-decoration: none; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s; letter-spacing: 0.02em;
+  }
+  .cta-btn:hover { background: var(--green-mid); transform: translateY(-2px); }
+  .cta-note { margin-top: 12px; font-size: 11px; color: var(--muted); }
+
+  .profile-strip {
+    display: flex; align-items: center; gap: 14px;
+    padding: 20px 24px;
+    background: var(--cream); border: 1px solid var(--border);
+    border-radius: 16px; margin-bottom: 16px;
+  }
+  .profile-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--green); color: var(--cream);
+    font-family: 'Noto Serif TC', serif; font-size: 16px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .profile-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .profile-role { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  footer { background: var(--green); text-align: center; padding: 28px 24px; font-size: 12px; color: var(--green-light); }
+  footer a { color: var(--cream); text-decoration: none; }
+
+  @media (max-width: 480px) {
+    .hero { padding: 48px 20px 44px; }
+    .hero-stat { gap: 16px; padding: 12px 20px; }
+    .main { padding: 28px 16px 60px; }
+    .card { padding: 18px; }
+  }
+
+  /* Gmail mockup styles */
+  .gmail-mock {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 10px 0 4px 34px;
+    overflow: hidden;
+    font-size: 12px;
+  }
+  .gmail-toolbar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px;
+    background: #f8f8f8;
+    border-bottom: 1px solid #e8e8e8;
+  }
+  .gmail-cb {
+    width: 16px; height: 16px; border-radius: 3px;
+    border: 2px solid var(--green); background: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 10px; flex-shrink: 0;
+  }
+  .gmail-cb.empty { background: white; border-color: #bbb; }
+  .gmail-arrow { color: #666; font-size: 10px; }
+  .gmail-icon-group { display: flex; gap: 6px; margin-left: 8px; }
+  .gmail-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #666; cursor: default;
+  }
+  .gmail-icon.trash-hl {
+    background: #fce8e8; color: #d93025;
+    position: relative;
+  }
+  .gmail-icon.trash-hl::after {
+    content: ''; position: absolute;
+    inset: -3px; border-radius: 50%;
+    border: 2px dashed #d93025;
+    animation: pulse-ring 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse-ring {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+  }
+  .gmail-banner {
+    background: #fdf8e0;
+    border-bottom: 1px solid #f0e6b8;
+    padding: 8px 12px;
+    font-size: 12px; color: #555;
+    line-height: 1.5;
+  }
+  .gmail-banner-link {
+    color: var(--green); font-weight: 600;
+    text-decoration: underline;
+    cursor: default;
+  }
+  .gmail-banner .click-hint {
+    display: inline-block;
+    background: var(--green); color: white;
+    font-size: 9px; font-weight: 600;
+    padding: 2px 6px; border-radius: 4px;
+    margin-left: 4px; letter-spacing: 0.05em;
+    animation: blink-hint 2s ease-in-out infinite;
+  }
+  @keyframes blink-hint {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .gmail-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 12px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .gmail-row:last-child { border-bottom: none; }
+  .gmail-sender { font-weight: 500; color: #333; min-width: 80px; font-size: 12px; }
+  .gmail-subj { color: #666; font-size: 11px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gmail-date { color: #999; font-size: 11px; flex-shrink: 0; }
+  .gmail-searchbar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; margin: 10px 0 4px 34px;
+    background: #eef1f5; border-radius: 24px;
+    font-size: 12px; color: #555;
+    border: 1px solid var(--border);
+  }
+  .gmail-searchbar .search-icon { font-size: 14px; color: #888; }
+  .gmail-searchbar .search-query { font-family: 'Courier New', monospace; color: var(--green); font-size: 11px; font-weight: 500; }
+  .step-caption { font-size: 11px; color: var(--muted); margin: 4px 0 0 34px; font-style: italic; }
+  .step-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 20px; }
+  .step-row:last-child { margin-bottom: 0; }
+
+  /* Gmail filter dialog mockup */
+  .gmail-dialog {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 10px 0 4px 34px;
+    overflow: hidden;
+    font-size: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+  .gmail-dialog-header {
+    padding: 12px 16px;
+    font-size: 14px; font-weight: 500;
+    color: var(--text);
+    border-bottom: 1px solid #e8e8e8;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .gmail-dialog-body { padding: 14px 16px; }
+  .gmail-field-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .gmail-field-label {
+    font-size: 12px; color: #555; min-width: 50px; text-align: right;
+  }
+  .gmail-field-input {
+    flex: 1; padding: 6px 10px;
+    border: 1px solid #ddd; border-radius: 4px;
+    font-size: 12px; color: var(--text);
+    background: #fafafa;
+  }
+  .gmail-field-input.filled {
+    background: #e8f5e9; border-color: var(--green);
+    color: var(--green); font-weight: 500;
+  }
+  .gmail-dialog-footer {
+    padding: 10px 16px;
+    border-top: 1px solid #e8e8e8;
+    display: flex; justify-content: flex-end; gap: 8px;
+  }
+  .gmail-btn {
+    padding: 7px 18px; border-radius: 6px;
+    font-size: 12px; font-weight: 500; cursor: default;
+    border: none;
+  }
+  .gmail-btn.primary {
+    background: #1a73e8; color: white;
+  }
+  .gmail-btn.secondary {
+    background: transparent; color: #1a73e8;
+    border: 1px solid #ddd;
+  }
+  .gmail-btn.hl {
+    position: relative;
+  }
+  .gmail-btn.hl::after {
+    content: ''; position: absolute;
+    inset: -3px; border-radius: 9px;
+    border: 2px dashed #1a73e8;
+    animation: pulse-ring 1.5s ease-in-out infinite;
+  }
+  .gmail-filter-actions { padding: 14px 16px; }
+  .gmail-checkbox-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px; font-size: 12px; color: #333;
+  }
+  .gmail-checkbox {
+    width: 16px; height: 16px; border-radius: 3px;
+    border: 2px solid #bbb; background: white;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 10px; flex-shrink: 0;
+  }
+  .gmail-checkbox.checked {
+    background: #1a73e8; border-color: #1a73e8;
+  }
+  .gmail-checkbox-row.highlight {
+    background: #fff8e1; padding: 6px 8px;
+    border-radius: 6px; border: 1px solid #ffe082;
+  }
+  .gmail-checkbox-row.highlight .click-hint {
+    display: inline-block;
+    background: var(--green); color: white;
+    font-size: 9px; font-weight: 600;
+    padding: 2px 6px; border-radius: 4px;
+    margin-left: 4px; letter-spacing: 0.05em;
+    animation: blink-hint 2s ease-in-out infinite;
+  }
+  .gmail-filter-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px;
+    border: 1px solid #ddd; border-radius: 50%;
+    font-size: 16px; cursor: default;
+    position: relative;
+  }
+  .gmail-filter-icon.hl::after {
+    content: ''; position: absolute;
+    inset: -3px; border-radius: 50%;
+    border: 2px dashed var(--green);
+    animation: pulse-ring 1.5s ease-in-out infinite;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="https://moresie.com">MORESIE</a>
+  <span class="nav-tag">免費 AI 工具</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">PHARMACIST × AI TOOLS × FREE</div>
+  <h1>Gmail 清理<br><em>指令產生器</em></h1>
+  <p class="hero-sub">不懂程式也能用。點幾下，自動產生搜尋指令，貼進 Gmail 30 秒清乾淨。</p>
+  <div class="hero-stat">
+    <div class="stat-item">
+      <span class="stat-num">30 秒</span>
+      <span class="stat-label">清完幾百封</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num">0</span>
+      <span class="stat-label">程式知識需求</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num">免費</span>
+      <span class="stat-label">永久開放</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="profile-strip">
+    <div class="profile-avatar">張</div>
+    <div>
+      <div class="profile-name">張藥師｜張菁月</div>
+      <div class="profile-role">藥師 × AI 工具開發者 · 我的信箱有 12,384 封，這工具是我自己在用的</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">寄件人 / 主旨</div>
+    <div class="field">
+      <label>寄件人關鍵字（Email 或平台名稱）</label>
+      <div class="input-wrap">
+        <input type="text" id="from" placeholder="例如：shopee、payuni（多個用逗號分隔）" oninput="build()">
+        <button class="clear-btn" type="button" onclick="clearInput('from')">✕</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>主旨關鍵字（選填）</label>
+      <div class="input-wrap">
+        <input type="text" id="subject" placeholder="例如：好物分享、通知、訂單" oninput="build()">
+        <button class="clear-btn" type="button" onclick="clearInput('subject')">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">信件分類（可複選）</div>
+    <div class="tag-group" id="categories">
+      <div class="tag" data-val="promotions" onclick="toggleCat(this)">促銷廣告</div>
+      <div class="tag" data-val="purchases" onclick="toggleCat(this)">購物訂單</div>
+      <div class="tag" data-val="social" onclick="toggleCat(this)">社群通知</div>
+      <div class="tag" data-val="updates" onclick="toggleCat(this)">系統更新</div>
+      <div class="tag" data-val="forums" onclick="toggleCat(this)">論壇通知</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">刪除範圍</div>
+    <div class="tag-group" id="times">
+      <div class="tag tag-danger" data-val="all" onclick="selectTime(this)">全部刪除（不限時間）</div>
+      <div class="tag" data-val="1d" onclick="selectTime(this)">1 天前</div>
+      <div class="tag" data-val="3d" onclick="selectTime(this)">3 天前</div>
+      <div class="tag active" data-val="7d" onclick="selectTime(this)">7 天前</div>
+      <div class="tag" data-val="14d" onclick="selectTime(this)">14 天前</div>
+      <div class="tag" data-val="30d" onclick="selectTime(this)">30 天前</div>
+      <div class="tag" data-val="6m" onclick="selectTime(this)">6 個月前</div>
+      <div class="tag" data-val="1y" onclick="selectTime(this)">1 年前</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">保留這些關鍵字（不刪）</div>
+    <div class="tag-group" id="excludes" style="margin-bottom:14px;">
+      <div class="tag" data-val="訂單" onclick="toggleEx(this)">訂單</div>
+      <div class="tag" data-val="出貨" onclick="toggleEx(this)">出貨</div>
+      <div class="tag" data-val="付款" onclick="toggleEx(this)">付款</div>
+      <div class="tag" data-val="合作" onclick="toggleEx(this)">合作邀約</div>
+      <div class="tag" data-val="order" onclick="toggleEx(this)">order</div>
+      <div class="tag" data-val="invoice" onclick="toggleEx(this)">invoice</div>
+    </div>
+    <div class="field">
+      <label>自訂排除關鍵字（用逗號分隔）</label>
+      <div class="input-wrap">
+        <input type="text" id="customEx" placeholder="例如：退款, 發票, 廠商" oninput="build()">
+        <button class="clear-btn" type="button" onclick="clearInput('customEx')">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="resetAll()">&#x21bb; 全部清除，重新填寫</button>
+
+  <div class="result-card">
+    <div class="result-label">你的 Gmail 搜尋指令</div>
+    <div class="result-box" id="result">
+      <span class="result-empty">填寫上方欄位後，指令會自動出現在這裡</span>
+    </div>
+    <div class="btn-group">
+      <button class="copy-btn" id="copyBtn" onclick="copyResult()">複製指令</button>
+      <a class="gmail-open-btn" id="gmailBtn" href="#" target="_blank" onclick="return openGmail()">
+        <span class="gmail-logo">✉</span> 直接在 Gmail 開啟並刪除
+      </a>
+    </div>
+  </div>
+
+  <div class="steps-card">
+    <div class="card-title" style="margin-bottom:18px;">使用步驟（附 Gmail 畫面示意）</div>
+
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-text">點上方「複製指令」按鈕</div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-text">打開 Gmail，把指令<strong>貼進搜尋欄</strong>，按 Enter</div>
+    </div>
+    <div class="gmail-searchbar">
+      <span class="search-icon">🔍</span>
+      <span class="search-query">from:(shopee) category:promotions older_than:7d</span>
+    </div>
+
+    <div class="step-row">
+      <div class="step-num" style="background:#1a73e8;">3</div>
+      <div class="step-text">點搜尋欄最右邊的 <strong>☰ 篩選器圖示</strong>（三條橫線 + 漏斗），打開進階搜尋</div>
+    </div>
+    <div class="gmail-mock">
+      <div class="gmail-toolbar" style="background:#eef1f5;border-radius:24px;border:1px solid #ddd;margin:0;padding:8px 14px;justify-content:space-between;">
+        <span style="font-size:12px;color:var(--green);font-family:'Courier New',monospace;">from:(shopee) older_than:7d</span>
+        <div class="gmail-filter-icon hl">☰</div>
+      </div>
+    </div>
+    <div class="step-caption">← 搜尋欄最右側的這個圖示，點下去會展開進階搜尋面板</div>
+
+    <div class="step-row">
+      <div class="step-num" style="background:#1a73e8;">4</div>
+      <div class="step-text">進階搜尋面板展開後，確認條件正確，點<strong>「建立篩選器」</strong></div>
+    </div>
+    <div class="gmail-dialog">
+      <div class="gmail-dialog-header">
+        <span>進階搜尋</span>
+      </div>
+      <div class="gmail-dialog-body">
+        <div class="gmail-field-row">
+          <span class="gmail-field-label">寄件者</span>
+          <div class="gmail-field-input filled">shopee</div>
+        </div>
+        <div class="gmail-field-row">
+          <span class="gmail-field-label">主旨</span>
+          <div class="gmail-field-input"></div>
+        </div>
+        <div class="gmail-field-row">
+          <span class="gmail-field-label">內含</span>
+          <div class="gmail-field-input"></div>
+        </div>
+      </div>
+      <div class="gmail-dialog-footer">
+        <div class="gmail-btn secondary">搜尋</div>
+        <div class="gmail-btn primary hl">建立篩選器</div>
+      </div>
+    </div>
+    <div class="step-caption">← 注意：不是按「搜尋」，是按右邊的「建立篩選器」</div>
+
+    <div class="step-row">
+      <div class="step-num" style="background:#d93025;">5</div>
+      <div class="step-text"><strong style="color:#d93025;">⚡ 關鍵步驟！</strong>勾選<strong>「刪除它」</strong>＋<strong>「同時套用篩選器至符合條件的會話群組」</strong>，再按<strong>「建立篩選器」</strong></div>
+    </div>
+    <div class="gmail-dialog">
+      <div class="gmail-dialog-header">
+        <span>進隞篩選器設定</span>
+      </div>
+      <div class="gmail-filter-actions">
+        <div class="gmail-checkbox-row">
+          <div class="gmail-checkbox">&nbsp;</div>
+          <span>跳過「收件匣」</span>
+        </div>
+        <div class="gmail-checkbox-row">
+          <div class="gmail-checkbox">&nbsp;</div>
+          <span>標示為已讀取</span>
+        </div>
+        <div class="gmail-checkbox-row highlight">
+          <div class="gmail-checkbox checked">✓</div>
+          <span><strong>刪除它</strong></span>
+          <span class="click-hint">← 勾這個！</span>
+        </div>
+        <div class="gmail-checkbox-row highlight" style="border-color:#c8e6c9;background:#e8f5e9;">
+          <div class="gmail-checkbox checked">✓</div>
+          <span><strong>同時套用篩選器至符合條件的會話群組</strong></span>
+          <span class="click-hint">← 這個也要勾！</span>
+        </div>
+        <div class="gmail-checkbox-row">
+          <div class="gmail-checkbox">&nbsp;</div>
+          <span>永不將它標示為垃圾郵件</span>
+        </div>
+      </div>
+      <div class="gmail-dialog-footer">
+        <div class="gmail-btn primary hl">建立篩選器</div>
+      </div>
+    </div>
+    <div class="step-caption">← 「同時套用篩選器至符合條件的會話群組」就是一次刪光所有舊信的秘密！</div>
+
+    <div class="step-row">
+      <div class="step-num">✓</div>
+      <div class="step-text">完成！Gmail 會自動把所有符合條件的信件移至垃圾桶（<strong>30 天後永久刪除</strong>）<br>且未來收到的同類信件也會自動刪除。如果不想自動刪新信，可以稍後去 Gmail 「設定 → 篩選器」刪掉這條規則。</div>
+    </div>
+
+  </div>
+
+  <div class="cta-card">
+    <div class="cta-eyebrow">MORESIE · SKOOL 社群</div>
+    <div class="cta-title">想要更多這類<br>免費 AI 工具？</div>
+    <div class="cta-desc">藥師親自開發驗證，不只教你用 AI，還把工具直接給你用。加入社群，永久免費。</div>
+    <div class="cta-features">
+      <span class="feature-pill">10+ 免費 AI 工具</span>
+      <span class="feature-pill">Prompt 模板庫</span>
+      <span class="feature-pill">藥師親自回覆</span>
+      <span class="feature-pill">韓國帶藥查詢器</span>
+    </div>
+    <a class="cta-btn" href="https://www.skool.com/pharmacist-ai-beginner-lab-7642" target="_blank">免費加入藥師的 AI 社群 →</a>
+    <div class="cta-note">免費 · 永久開放 · 不需要信用卡</div>
+  </div>
+
+</div>
+
+<footer>
+  <div style="margin-bottom:6px;">
+    <a href="https://moresie.com">MORESIE · 找到亮生活</a>
+  </div>
+  <div>藥師專業把關 × AI 工具自主研發 × 全方位生活提升</div>
+</footer>
+
+<script>
+let selectedTime = '7d';
+let selectedCats = [];
+let selectedEx = [];
+
+function toggleCat(el) {
+  el.classList.toggle('active');
+  const v = el.dataset.val;
+  selectedCats = el.classList.contains('active')
+    ? [...selectedCats, v]
+    : selectedCats.filter(x => x !== v);
+  build();
+}
+
+function selectTime(el) {
+  document.querySelectorAll('#times .tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  selectedTime = el.dataset.val;
+  build();
+}
+
+function toggleEx(el) {
+  el.classList.toggle('active');
+  const v = el.dataset.val;
+  selectedEx = el.classList.contains('active')
+    ? [...selectedEx, v]
+    : selectedEx.filter(x => x !== v);
+  build();
+}
+
+function resetAll() {
+  document.getElementById('from').value = '';
+  document.getElementById('subject').value = '';
+  document.getElementById('customEx').value = '';
+  selectedCats = [];
+  selectedEx = [];
+  selectedTime = '7d';
+  document.querySelectorAll('#categories .tag, #excludes .tag').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#times .tag').forEach(t => {
+    t.classList.remove('active');
+    if (t.dataset.val === '7d') t.classList.add('active');
+  });
+  build();
+}
+
+function clearInput(id) {
+  document.getElementById(id).value = '';
+  build();
+}
+
+function build() {
+  const from = document.getElementById('from').value.trim();
+  const subject = document.getElementById('subject').value.trim();
+  const customEx = document.getElementById('customEx').value.trim();
+
+  let parts = [];
+
+  // Handle multiple senders, auto-detect emails
+  if (from) {
+    var allEmails = from.match(/[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}/g) || [];
+    var senders = allEmails.filter(function(v, i, a) { return a.indexOf(v) === i; });
+    if (senders.length === 0) {
+      senders = from.replace(/[<>]/g, " ").split(/[,;]+/).map(function(s){return s.trim()}).filter(function(s){return s});
+    }
+    if (senders.length === 1) {
+      parts.push("from:(" + senders[0] + ")");
+    } else if (senders.length > 1) {
+      parts.push("{" + senders.map(function(s){return "from:(" + s + ")"}).join(" ") + "}");
+    }
+  }
+
+  if (subject) parts.push('subject:(' + subject + ')');
+  if (selectedCats.length === 1) {
+    parts.push('category:' + selectedCats[0]);
+  } else if (selectedCats.length > 1) {
+    parts.push('{' + selectedCats.map(c => 'category:' + c).join(' ') + '}');
+  }
+  if (selectedTime !== 'all') {
+    parts.push('older_than:' + selectedTime);
+  }
+
+  let allEx = [...selectedEx];
+  if (customEx) {
+    customEx.split(',').forEach(e => {
+      const t = e.trim();
+      if (t) allEx.push(t);
+    });
+  }
+  allEx.forEach(ex => parts.push('-subject:(' + ex + ')'));
+
+  const resultEl = document.getElementById('result');
+  const hasInput = from || subject || selectedCats.length > 0;
+  if (!hasInput) {
+    resultEl.innerHTML = '<span class="result-empty">填寫上方欄位後，指令會自動出現在這裡</span>';
+  } else {
+    resultEl.textContent = parts.join(' ');
+  }
+
+  document.getElementById('copyBtn').textContent = '複製指令';
+  document.getElementById('copyBtn').classList.remove('copied');
+}
+
+function copyResult() {
+  const text = document.getElementById('result').textContent;
+  if (text.includes('填寫')) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '已複製！貼進 Gmail 搜尋欄吧';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '複製指令';
+      btn.classList.remove('copied');
+    }, 3000);
+  });
+}
+
+build();
+
+// Auto-move cursor to end after paste, and click anywhere on input to go to end
+document.getElementById('from').addEventListener('paste', function() {
+  var el = this;
+  setTimeout(function() {
+    el.selectionStart = el.selectionEnd = el.value.length;
+    el.scrollLeft = el.scrollWidth;
+    build();
+  }, 0);
+});
+document.getElementById('from').addEventListener('click', function() {
+  this.selectionStart = this.selectionEnd = this.value.length;
+});
+
+function openGmail() {
+  const text = document.getElementById('result').textContent;
+  if (text.includes('填寫')) {
+    // no query yet
+    return false;
+  }
+  const encoded = encodeURIComponent(text);
+  const url = 'https://mail.google.com/mail/u/0/#search/' + encoded;
+  window.open(url, '_blank');
+  return false;
+}
+</script>
+</body>
+</html>
